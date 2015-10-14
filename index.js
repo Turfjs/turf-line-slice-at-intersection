@@ -46,7 +46,6 @@ module.exports = function (line, segmenter) {
         for (var j = 0; j < ring.length - 1; j++) {
 
           if (equal(segments[s][i], ring[j])) {
-            console.log("EOUAL")
             tempSegments.push(curr.slice());
             curr = [segments[s][i]];
             continue;
