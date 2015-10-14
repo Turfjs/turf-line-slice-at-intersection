@@ -44,6 +44,15 @@ module.exports = function (line, segmenter) {
         curr.push(segments[s][i]);
 
         for (var j = 0; j < ring.length - 1; j++) {
+
+          if (equal(segments[s][i], ring[j])) {
+            console.log("EOUAL")
+            tempSegments.push(curr.slice());
+            curr = [segments[s][i]];
+            continue;
+          }
+
+
           var is = linesIntersect(
             segments[s][i],
             segments[s][i + 1],
@@ -70,6 +79,10 @@ module.exports = function (line, segmenter) {
 };
 
 
+function equal(pt1, pt2) {
+  return (pt1[0] === pt2[0] && pt1[1] === pt2[1]);
+}
+
 function linesIntersect(l1Start, l1End, l2Start, l2End) {
   var a1 = {
       x: l1Start[0],
@@ -94,7 +107,7 @@ function linesIntersect(l1Start, l1End, l2Start, l2End) {
   if (uB !== 0) {
     var ua = uaT / uB,
       ub = ubT / uB;
-    if (ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1) {
+    if (ua > 0 && ua < 1 && ub > 0 && ub < 1) {
       return [a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y)];
     }
   }
