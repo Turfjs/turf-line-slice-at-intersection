@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint index.js",
-    "test": "tap test/test.js"
+    "test": "tap test/test.js",
+    "doc": "dox -r < index.js | doxme --readme > README.md"
   },
   "author": "",
   "license": "ISC",
@@ -14,9 +15,11 @@
     "turf-linestring": "^1.0.2"
   },
   "devDependencies": {
-    "glob": "^5.0.15",
-    "tap": "^2.1.1",
+    "dox": "^0.8.0",
+    "doxme": "^1.8.2",
     "eslint": "^1.6.0",
-    "eslint-config-mourner": "^1.0.1"
+    "eslint-config-mourner": "^1.0.1",
+    "glob": "^5.0.15",
+    "tap": "^2.1.1"
   }
 }

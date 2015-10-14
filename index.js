@@ -1,7 +1,19 @@
 var linestring = require('turf-linestring'),
   featurecollection = require('turf-featurecollection');
 
-module.exports = function (segmentee, segmenter) {
+/**
+ * Takes a {@link LineString} and a Feature to segment it by. 
+ *
+ * Any time the line intersects the feature, it will be segmented.
+ *
+ * @module turf/shape-segment
+ * @category misc
+ * @param {Feature<LineString>} line line to segment
+ * @param {Feature} segmenter feature to segment `line` by
+ * @return {FeatureCollection<LineString>} segmented lines
+ *
+ */
+module.exports = function (line, segmenter) {
   var coordRings = [];
 
   switch (segmenter.geometry.type) {
@@ -19,17 +31,10 @@ module.exports = function (segmentee, segmenter) {
       break;
   }
 
-  var segments = [segmentee.geometry.coordinates.slice()];
-
-  // for (var k = 0; k < segmentee.geometry.coordinates.length - 1; k++) {
-  //   segments.push([
-  //     segmentee.geometry.coordinates[k],
-  //     segmentee.geometry.coordinates[k + 1]
-  //   ]);
-  // }
+  var segments = [line.geometry.coordinates.slice()];
 
   coordRings.forEach(function (ring) {
-    // for each segment of the segmenter and each segment of the segmentee,
+    // for each segment of the segmenter and each segment of the line,
     // find intersections and insert them.
     var tempSegments = [];
 
@@ -60,7 +65,7 @@ module.exports = function (segmentee, segmenter) {
   });
 
   return featurecollection(segments.map(function (segment) {
-    return linestring(segment, segmentee.properties);
+    return linestring(segment, line.properties);
   }));
 };
 
