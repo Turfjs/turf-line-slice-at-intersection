@@ -1,13 +1,27 @@
 {
-  "name": "turf-shape-segment",
-  "version": "0.3.0",
-  "description": "",
+  "name": "turf-line-slice-at-intersection",
+  "version": "1.0.0",
+  "description": "Slice a line whenever it intersects other features",
   "main": "index.js",
   "scripts": {
     "lint": "eslint index.js",
     "test": "tap test/test.js",
     "doc": "dox -r < index.js | doxme --readme > README.md"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Turfjs/turf-line-slice-at-intersection.git"
+  },
+   "bugs": {
+    "url": "https://github.com/Turfjs/turf-line-slice-at-intersection/issues"
+  },
+  "keywords": [
+    "turf",
+    "gis",
+    "geojson",
+    "linestring",
+    "line segment"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {

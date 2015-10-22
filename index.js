@@ -2,22 +2,114 @@ var linestring = require('turf-linestring'),
   featurecollection = require('turf-featurecollection');
 
 /**
- * Takes a {@link LineString} and a Feature to segment it by. 
+ * Takes a {@link LineString} and a Feature to segment it by.
  *
  * Any time the line intersects the feature, it will be segmented.
  *
- * @module turf/shape-segment
+ * @module turf/line-slice-at-intersection
  * @category misc
  * @param {Feature<LineString>} line line to segment
  * @param {Feature} segmenter feature to segment `line` by
  * @return {FeatureCollection<LineString>} segmented lines
+ * @example
+ * var line = {
+ *   "type": "Feature",
+ *   "properties": {},
+ *   "geometry": {
+ *     "type": "LineString",
+ *     "coordinates": [
+ *       [
+ *         -24.78515625,
+ *         2.7235830833483856
+ *       ],
+ *       [
+ *         -22.8515625,
+ *         2.1967272417616712
+ *       ],
+ *       [
+ *         -20.390625,
+ *         5.003394345022162
+ *       ],
+ *       [
+ *         -18.984375,
+ *         2.6357885741666065
+ *       ],
+ *       [
+ *         -14.94140625,
+ *         4.8282597468669755
+ *       ],
+ *       [
+ *         -11.337890625,
+ *         7.536764322084078
+ *       ],
+ *       [
+ *         -9.052734375,
+ *         3.601142320158722
+ *       ],
+ *       [
+ *         -6.328125,
+ *         0.3515602939922709
+ *       ]
+ *     ]
+ *   }
+ * };
  *
+ * var poly = {
+ *   "type": "Feature",
+ *   "properties": {},
+ *   "geometry": {
+ *     "type": "Polygon",
+ *     "coordinates": [
+ *       [
+ *         [
+ *           -20.91796875,
+ *           9.882275493429953
+ *         ],
+ *         [
+ *           -22.67578125,
+ *           6.926426847059551
+ *         ],
+ *         [
+ *           -21.005859375,
+ *           1.6696855009865839
+ *         ],
+ *         [
+ *           -18.45703125,
+ *           5.090944175033399
+ *         ],
+ *         [
+ *           -16.083984375,
+ *           1.845383988573187
+ *         ],
+ *         [
+ *           -13.798828125,
+ *           8.928487062665504
+ *         ],
+ *         [
+ *           -20.91796875,
+ *           9.882275493429953
+ *         ]
+ *       ]
+ *     ]
+ *   }
+ * };
+ *
+ * var features = turf.featurecollection([line,poly])
+ * //=features
+ *
+ * var result = turf.lineSliceAtIntersection(line, poly);
+ *
+ * result.features.forEach(function(ft, ind) {
+ *   ft.properties.stroke = (ind % 2 === 0) ? '#f40' : '#389979';
+ * });
+ *
+ * //=result
  */
 module.exports = function (line, segmenter) {
-  var coordRings = [];  
+  var coordRings = [];
   var segmenterFeatures = (segmenter.type === 'FeatureCollection') ?
     segmenter.features :
-    [segmenter]
+    [segmenter];
 
   var segments = [line.geometry.coordinates.slice()];
 
@@ -31,36 +123,37 @@ module.exports = function (line, segmenter) {
         coordRings = segmenterFeatures[i].geometry.coordinates;
         break;
       case 'MultiPolygon':
-        segmenterFeatures[i].geometry.coordinates.forEach(function (polygon) {
-          coordRings = coordRings.concat(polygon);
-        });
+        for (var p = 0; p < segmenterFeatures[i].geometry.coordinates.length; p++) {
+          coordRings = coordRings.concat(segmenterFeatures[i].geometry.coordinates[p]);
+        }
         break;
     }
 
-    coordRings.forEach(function (ring) {
+    for (var j = 0; j < coordRings.length; j++) {
+      var ring = coordRings[j];
       // for each segment of the segmenter and each segment of the line,
       // find intersections and insert them.
       var tempSegments = [];
 
-      for (var s = 0; s < segments.length; s++) {
+      for (var k = 0; k < segments.length; k++) {
         var curr = [];
-        for (var i = 0; i < segments[s].length - 1; i++) {
-          curr.push(segments[s][i]);
+        for (var l = 0; l < segments[k].length - 1; l++) {
+          curr.push(segments[k][l]);
 
-          for (var j = 0; j < ring.length - 1; j++) {
+          for (var m = 0; m < ring.length - 1; m++) {
 
-            if (equal(segments[s][i], ring[j])) {
+            if (equal(segments[k][l], ring[m])) {
               tempSegments.push(curr.slice());
-              curr = [segments[s][i]];
+              curr = [segments[k][l]];
               continue;
             }
 
 
             var is = linesIntersect(
-              segments[s][i],
-              segments[s][i + 1],
-              ring[j],
-              ring[j + 1]
+              segments[k][l],
+              segments[k][l + 1],
+              ring[m],
+              ring[m + 1]
             );
 
             if (is) {
@@ -70,11 +163,11 @@ module.exports = function (line, segmenter) {
             }
           }
         }
-        curr.push(segments[s][segments[s].length - 1]);
+        curr.push(segments[k][segments[k].length - 1]);
         tempSegments.push(curr.slice());
       }
       segments = tempSegments;
-    });
+    }
   }
 
   return featurecollection(segments.map(function (segment) {
