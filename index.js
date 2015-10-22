@@ -130,43 +130,7 @@ module.exports = function (line, segmenter) {
     }
 
     for (var j = 0; j < coordRings.length; j++) {
-      var ring = coordRings[j];
-      // for each segment of the segmenter and each segment of the line,
-      // find intersections and insert them.
-      var tempSegments = [];
-
-      for (var k = 0; k < segments.length; k++) {
-        var curr = [];
-        for (var l = 0; l < segments[k].length - 1; l++) {
-          curr.push(segments[k][l]);
-
-          for (var m = 0; m < ring.length - 1; m++) {
-
-            if (equal(segments[k][l], ring[m])) {
-              tempSegments.push(curr.slice());
-              curr = [segments[k][l]];
-              continue;
-            }
-
-
-            var is = linesIntersect(
-              segments[k][l],
-              segments[k][l + 1],
-              ring[m],
-              ring[m + 1]
-            );
-
-            if (is) {
-              curr.push(is);
-              tempSegments.push(curr.slice());
-              curr = [is];
-            }
-          }
-        }
-        curr.push(segments[k][segments[k].length - 1]);
-        tempSegments.push(curr.slice());
-      }
-      segments = tempSegments;
+      segments = testLineAndRing(segments, coordRings[j]);
     }
   }
 
@@ -174,6 +138,44 @@ module.exports = function (line, segmenter) {
     return linestring(segment, line.properties);
   }));
 };
+
+// Tests the list of segments against a single polygon ring / line. Returns new segments
+function testLineAndRing(segments, ring) {
+  var tempSegments = [];
+
+  for (var k = 0; k < segments.length; k++) {
+    var curr = [];
+    for (var l = 0; l < segments[k].length - 1; l++) {
+      curr.push(segments[k][l]);
+
+      for (var m = 0; m < ring.length - 1; m++) {
+
+        if (equal(segments[k][l], ring[m])) {
+          tempSegments.push(curr.slice());
+          curr = [segments[k][l]];
+          continue;
+        }
+
+        var is = linesIntersect(
+          segments[k][l],
+          segments[k][l + 1],
+          ring[m],
+          ring[m + 1]
+        );
+
+        if (is) {
+          curr.push(is);
+          tempSegments.push(curr.slice());
+          curr = [is];
+        }
+      }
+    }
+    curr.push(segments[k][segments[k].length - 1]);
+    tempSegments.push(curr.slice());
+  }
+
+  return tempSegments;
+}
 
 
 function equal(pt1, pt2) {

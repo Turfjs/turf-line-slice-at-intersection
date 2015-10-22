@@ -5,7 +5,7 @@ Slice a line whenever it intersects other features
 
 ### `turf.line-slice-at-intersection(line, segmenter)`
 
-Takes a LineString and a Feature to segment it by. 
+Takes a LineString and a Feature to segment it by.
 
 Any time the line intersects the feature, it will be segmented.
 
