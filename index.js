@@ -1,5 +1,6 @@
 var linestring = require('turf-linestring'),
-  featurecollection = require('turf-featurecollection');
+  featurecollection = require('turf-featurecollection'),
+  xtend = require('xtend');
 
 /**
  * Takes a {@link LineString} and a Feature to segment it by.
@@ -135,7 +136,7 @@ module.exports = function (line, segmenter) {
   }
 
   return featurecollection(segments.map(function (segment) {
-    return linestring(segment, line.properties);
+    return linestring(segment, xtend({}, line.properties));
   }));
 };
 
