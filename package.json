@@ -1,6 +1,6 @@
 {
   "name": "turf-line-slice-at-intersection",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Slice a line whenever it intersects other features",
   "main": "index.js",
   "scripts": {
